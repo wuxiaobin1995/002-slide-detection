@@ -1,7 +1,7 @@
 <!--
  * @Author      : Mr.bin
  * @Date        : 2024-03-12 15:11:07
- * @LastEditTime: 2024-11-05 10:19:46
+ * @LastEditTime: 2024-11-05 11:44:22
  * @Description : home
 -->
 <template>
@@ -1231,9 +1231,9 @@ export default {
             k4 = gg15.k4
             switch (modelValue) {
               case 'AA':
-                dg_constant = 5
-                toA_constant = -12
-                toB_constant = 26
+                dg_constant = 3
+                toA_constant = -22
+                toB_constant = -8
                 break
               case 'AN':
                 dg_constant = 5
