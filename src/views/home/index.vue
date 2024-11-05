@@ -1,7 +1,7 @@
 <!--
  * @Author      : Mr.bin
  * @Date        : 2024-03-12 15:11:07
- * @LastEditTime: 2024-10-09 11:25:08
+ * @LastEditTime: 2024-11-05 10:19:46
  * @Description : home
 -->
 <template>
@@ -270,16 +270,16 @@ export default {
       specSelection: [
         {
           value: '15'
-        },
-        {
-          value: '20'
-        },
-        {
-          value: '25'
-        },
-        {
-          value: '30'
         }
+        // {
+        //   value: '20'
+        // },
+        // {
+        //   value: '25'
+        // },
+        // {
+        //   value: '30'
+        // }
         // {
         //   value: '35'
         // },
@@ -559,7 +559,7 @@ export default {
           this.$axios
             .post(api, {
               sxm: this.QRCode,
-              xhgg: 'TSGS' + this.specValue + this.modelValue,
+              xhgg: 'TSGE' + this.specValue + this.modelValue,
               zxj: this.centerSpacing,
               dg: this.dg,
               daoa: this.toA,
@@ -1624,7 +1624,7 @@ export default {
           const api = `http://${this.ip}/st_t6_sql_001_slide_detection/public/index.php/slideDetection/getTTData`
           this.$axios
             .post(api, {
-              xhgg: 'TSGS' + this.specValue + this.modelValue,
+              xhgg: 'TSGE' + this.specValue + this.modelValue,
               zxj: 0,
               dg: this.dg,
               daoa: this.toA,
@@ -1639,7 +1639,7 @@ export default {
                 this.accuracyClass = data.result[0].ReviewPrecision
 
                 // console.log(this.QRCode)
-                // console.log('TSGS' + this.specValue + this.modelValue)
+                // console.log('TSGE' + this.specValue + this.modelValue)
                 // console.log(this.centerSpacing)
                 // console.log(this.dg)
                 // console.log(this.toA)
@@ -1654,7 +1654,7 @@ export default {
                 this.$axios
                   .post(api, {
                     sxm: this.QRCode,
-                    xhgg: 'TSGS' + this.specValue + this.modelValue,
+                    xhgg: 'TSGE' + this.specValue + this.modelValue,
                     zxj: this.centerSpacing,
                     dg: this.dg,
                     daoa: this.toA,

@@ -6,7 +6,8 @@
  */
 
 const projectName = '002-slide-detection' // 项目名称，是一个程序的唯一标识符
-const softwareName = '002-低模组滑块数据检测软件' // 软件名称
+// const softwareName = '002-低模组滑块数据检测软件' // 软件名称
+const softwareName = '临时的-低模组滑块数据检测软件' // 软件名称
 
 const logo = './public/ico/logo/medical.ico' // 软件图标（医疗）
 // const logo = './public/ico/logo/power.ico' // 软件图标（运动）
