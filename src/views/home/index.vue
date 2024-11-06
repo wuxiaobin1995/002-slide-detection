@@ -1,7 +1,7 @@
 <!--
  * @Author      : Mr.bin
  * @Date        : 2024-03-12 15:11:07
- * @LastEditTime: 2024-11-05 11:44:22
+ * @LastEditTime: 2024-11-06 11:55:47
  * @Description : home
 -->
 <template>
@@ -1397,7 +1397,7 @@ export default {
           let centerSpacing_k = 0
           switch (specValue) {
             case '15':
-              centerSpacing_k = 0.01
+              centerSpacing_k = 0.0036
               break
             case '20':
               centerSpacing_k = 0.014
@@ -1414,8 +1414,8 @@ export default {
           }
           const standard_d = parseFloat(standard_array[0][0] * centerSpacing_k)
           if (specValue === '15') {
-            centerSpacing_min = standard_d - 1
-            centerSpacing_max = standard_d + 5
+            centerSpacing_min = standard_d
+            centerSpacing_max = standard_d + 1
           } else if (specValue === '20') {
             if (
               modelValue === 'HAA' ||
