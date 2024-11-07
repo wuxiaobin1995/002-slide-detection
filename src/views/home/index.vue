@@ -1,7 +1,7 @@
 <!--
  * @Author      : Mr.bin
  * @Date        : 2024-03-12 15:11:07
- * @LastEditTime: 2024-11-06 11:55:47
+ * @LastEditTime: 2024-11-07 09:45:29
  * @Description : home
 -->
 <template>
@@ -1232,7 +1232,7 @@ export default {
             switch (modelValue) {
               case 'AA':
                 dg_constant = 3
-                toA_constant = -22
+                toA_constant = -11
                 toB_constant = -8
                 break
               case 'AN':
