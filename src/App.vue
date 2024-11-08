@@ -1,7 +1,7 @@
 <!--
  * @Author      : Mr.bin
  * @Date        : 2024-02-07 14:19:10
- * @LastEditTime: 2024-10-07 16:39:32
+ * @LastEditTime: 2024-11-08 10:41:30
  * @Description : 根组件
 -->
 <template>
@@ -54,19 +54,19 @@ export default {
           k2: 125.4,
           k3: 141.0,
           k4: 141.0
-        },
-        {
-          gg: '35',
-          k2: 129.5,
-          k3: 139.4,
-          k4: 143.4
-        },
-        {
-          gg: '45',
-          k2: 86.1,
-          k3: 138.0,
-          k4: 145.9
         }
+        // {
+        //   gg: '35',
+        //   k2: 129.5,
+        //   k3: 139.4,
+        //   k4: 143.4
+        // },
+        // {
+        //   gg: '45',
+        //   k2: 86.1,
+        //   k3: 138.0,
+        //   k4: 145.9
+        // }
       ]
       if (!window.localStorage.getItem('sensor_k')) {
         window.localStorage.setItem('sensor_k', JSON.stringify(sensor_k))
