@@ -5,4 +5,4 @@
  * @Description : 002-slide-detection
 -->
 
-# 低模组-滑块数据检测软件
+# 低组装-滑块数据检测软件

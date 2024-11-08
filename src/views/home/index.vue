@@ -1,7 +1,7 @@
 <!--
  * @Author      : Mr.bin
  * @Date        : 2024-03-12 15:11:07
- * @LastEditTime: 2024-11-07 09:45:29
+ * @LastEditTime: 2024-11-08 10:00:52
  * @Description : home
 -->
 <template>
@@ -270,16 +270,16 @@ export default {
       specSelection: [
         {
           value: '15'
+        },
+        {
+          value: '20'
+        },
+        {
+          value: '25'
+        },
+        {
+          value: '30'
         }
-        // {
-        //   value: '20'
-        // },
-        // {
-        //   value: '25'
-        // },
-        // {
-        //   value: '30'
-        // }
         // {
         //   value: '35'
         // },
@@ -924,34 +924,41 @@ export default {
                 }
                 // 按键的键值（0-没有按键，1-标定按键，2-测量按键，3-清空按键）
                 const keyNum = dataArray[0]
-                // 工位1（15或30）
+                // 工位1（15）
                 const workstation_1 = [
                   dataArray[1],
                   dataArray[2],
                   dataArray[3],
                   dataArray[4]
                 ]
-                // 工位2（20或35）
+                // 工位2（20）
                 const workstation_2 = [
                   dataArray[5],
                   dataArray[6],
                   dataArray[7],
                   dataArray[8]
                 ]
-                // 工位3（25或45）
+                // 工位3（25）
                 const workstation_3 = [
                   dataArray[9],
                   dataArray[10],
                   dataArray[11],
                   dataArray[12]
                 ]
+                // 工位4（30）
+                const workstation_4 = [
+                  dataArray[13],
+                  dataArray[14],
+                  dataArray[15],
+                  dataArray[16]
+                ]
 
                 /* 第2步：根据不同工位进行后续处理 */
                 // 先判断是否选择了规格和型号，都选择了才进行后续处理
                 if (this.specValue === '' || this.modelValue === '') {
                 } else {
-                  if (this.specValue === '15' || this.specValue === '30') {
-                    /* 工位1或工位4（15或30） */
+                  if (this.specValue === '15') {
+                    /* 工位1 */
                     if (keyNum === 0) {
                       // 没有按键按下，此时就单纯在界面上实时显示4个传感器的数字量，一维数组
                       this.showSensorArray = workstation_1
@@ -1014,11 +1021,8 @@ export default {
                         duration: 2500
                       })
                     }
-                  } else if (
-                    this.specValue === '20' ||
-                    this.specValue === '35'
-                  ) {
-                    /* 工位2或工位5（20或35） */
+                  } else if (this.specValue === '20') {
+                    /* 工位2 */
                     if (keyNum === 0) {
                       // 没有按键按下，此时就单纯在界面上实时显示4个传感器的数字量，一维数组
                       this.showSensorArray = workstation_2
@@ -1081,11 +1085,8 @@ export default {
                         duration: 2500
                       })
                     }
-                  } else if (
-                    this.specValue === '25' ||
-                    this.specValue === '45'
-                  ) {
-                    /* 工位3或工位6（25或45） */
+                  } else if (this.specValue === '25') {
+                    /* 工位3 */
                     if (keyNum === 0) {
                       // 没有按键按下，此时就单纯在界面上实时显示4个传感器的数字量，一维数组
                       this.showSensorArray = workstation_3
@@ -1135,6 +1136,70 @@ export default {
                           workstation_3[1],
                           workstation_3[2],
                           workstation_3[3]
+                        ])
+                        // 测量完成，调用save函数，计算结果并调用后端API
+                        this.save()
+                      }
+                    } else if (keyNum === 3) {
+                      // 清空按键按下，此时就把成品滑块数据数组清空
+                      this.finishSliderArray = []
+                      this.$message({
+                        message: `清空成功`,
+                        type: 'success',
+                        duration: 2500
+                      })
+                    }
+                  } else if (this.specValue === '30') {
+                    /* 工位4 */
+                    if (keyNum === 0) {
+                      // 没有按键按下，此时就单纯在界面上实时显示4个传感器的数字量，一维数组
+                      this.showSensorArray = workstation_4
+                    } else if (keyNum === 1) {
+                      // 标定按键按下，此时就把数据存入到标准滑块数据数组，二维数组
+                      if (this.standardSliderArray.length <= 2) {
+                        // 按第1~3下
+                        this.standardSliderArray.push([
+                          workstation_4[0],
+                          workstation_4[1],
+                          workstation_4[2],
+                          workstation_4[3]
+                        ])
+                      } else if (this.standardSliderArray.length === 3) {
+                        // 按第4下
+                        this.standardSliderArray.push([
+                          workstation_4[0],
+                          workstation_4[1],
+                          workstation_4[2],
+                          workstation_4[3]
+                        ])
+                        // 标定完成，标定值保存到SessionStorage
+                        window.sessionStorage.setItem(
+                          'standard_slider_value',
+                          JSON.stringify(this.standardSliderArray)
+                        )
+                        this.$message({
+                          message: `标定完成`,
+                          type: 'success',
+                          duration: 5000
+                        })
+                      }
+                    } else if (keyNum === 2) {
+                      // 测量按键按下，此时就把数据存入到成品滑块数据数组，二维数组
+                      if (this.finishSliderArray.length <= 2) {
+                        // 按第1~3下
+                        this.finishSliderArray.push([
+                          workstation_4[0],
+                          workstation_4[1],
+                          workstation_4[2],
+                          workstation_4[3]
+                        ])
+                      } else if (this.finishSliderArray.length === 3) {
+                        // 按第4下
+                        this.finishSliderArray.push([
+                          workstation_4[0],
+                          workstation_4[1],
+                          workstation_4[2],
+                          workstation_4[3]
                         ])
                         // 测量完成，调用save函数，计算结果并调用后端API
                         this.save()
