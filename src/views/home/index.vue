@@ -1,7 +1,7 @@
 <!--
  * @Author      : Mr.bin
  * @Date        : 2024-03-12 15:11:07
- * @LastEditTime: 2024-11-14 14:45:29
+ * @LastEditTime: 2024-11-15 09:21:06
  * @Description : home
 -->
 <template>
@@ -280,12 +280,6 @@ export default {
         {
           value: '30'
         }
-        // {
-        //   value: '35'
-        // },
-        // {
-        //   value: '45'
-        // }
       ],
       /* 型号 */
       modelValue: '',
@@ -1306,9 +1300,9 @@ export default {
                 toB_constant = 2
                 break
               case 'DA':
-                dg_constant = 5
-                toA_constant = -12
-                toB_constant = 26
+                dg_constant = 3
+                toA_constant = -11
+                toB_constant = -8
                 break
               default:
                 dg_constant = 0
