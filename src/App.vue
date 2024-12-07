@@ -1,7 +1,7 @@
 <!--
  * @Author      : Mr.bin
  * @Date        : 2024-02-07 14:19:10
- * @LastEditTime: 2024-11-15 09:20:46
+ * @LastEditTime: 2024-12-04 14:16:32
  * @Description : 根组件
 -->
 <template>
@@ -33,27 +33,27 @@ export default {
       const sensor_k = [
         {
           gg: '15',
-          k2: 155.6,
-          k3: 146.1,
-          k4: 156.6
+          k2: ,
+          k3: ,
+          k4:
         },
         {
           gg: '20',
-          k2: 152.8,
-          k3: 152.7,
-          k4: 132.6
+          k2: ,
+          k3: ,
+          k4:
         },
         {
           gg: '25',
-          k2: 153.6,
-          k3: 149.4,
-          k4: 135.5
+          k2: ,
+          k3: ,
+          k4:
         },
         {
           gg: '30',
-          k2: 125.4,
-          k3: 141.0,
-          k4: 141.0
+          k2: ,
+          k3: ,
+          k4:
         }
       ]
       if (!window.localStorage.getItem('sensor_k')) {
