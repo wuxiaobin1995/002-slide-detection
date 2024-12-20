@@ -1,7 +1,7 @@
 <!--
  * @Author      : Mr.bin
  * @Date        : 2024-03-12 15:11:07
- * @LastEditTime: 2024-12-04 14:17:24
+ * @LastEditTime: 2024-12-20 15:13:43
  * @Description : home
 -->
 <template>
@@ -1459,13 +1459,13 @@ export default {
               centerSpacing_k = 0.0036
               break
             case '20':
-              centerSpacing_k =
+              centerSpacing_k = 0
               break
             case '25':
-              centerSpacing_k =
+              centerSpacing_k = 0
               break
             case '30':
-              centerSpacing_k =
+              centerSpacing_k = 0
               break
             default:
               centerSpacing_k = 0

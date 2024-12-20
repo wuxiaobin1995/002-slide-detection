@@ -1,7 +1,7 @@
 <!--
  * @Author      : Mr.bin
  * @Date        : 2024-02-07 14:19:10
- * @LastEditTime: 2024-12-04 14:16:32
+ * @LastEditTime: 2024-12-20 15:15:41
  * @Description : 根组件
 -->
 <template>
@@ -29,31 +29,35 @@ export default {
         window.localStorage.setItem('ip', '192.168.1.100')
       }
 
-      /* 初始化传感器K2~K4 */
+      /* 初始化传感器K1~K4 */
       const sensor_k = [
         {
           gg: '15',
-          k2: ,
-          k3: ,
-          k4:
+          k1: 0,
+          k2: 0,
+          k3: 0,
+          k4: 0
         },
         {
           gg: '20',
-          k2: ,
-          k3: ,
-          k4:
+          k1: 0,
+          k2: 0,
+          k3: 0,
+          k4: 0
         },
         {
           gg: '25',
-          k2: ,
-          k3: ,
-          k4:
+          k1: 0,
+          k2: 0,
+          k3: 0,
+          k4: 0
         },
         {
           gg: '30',
-          k2: ,
-          k3: ,
-          k4:
+          k1: 0,
+          k2: 0,
+          k3: 0,
+          k4: 0
         }
       ]
       if (!window.localStorage.getItem('sensor_k')) {
