@@ -1,7 +1,7 @@
 <!--
  * @Author      : Mr.bin
  * @Date        : 2024-10-07 15:23:00
- * @LastEditTime: 2024-10-09 11:27:40
+ * @LastEditTime: 2024-12-20 10:07:23
  * @Description : 修改传感器K值
 -->
 <template>
@@ -16,26 +16,37 @@
 
       <div class="box">
         <el-row class="row">
-          <el-col :span="6">
+          <el-col :span="4">
             <div class="item title">工位</div>
           </el-col>
-          <el-col :span="6">
-            <div class="item title">K2</div>
+          <el-col :span="5">
+            <div class="item title">K1(应变片)</div>
           </el-col>
-          <el-col :span="6">
-            <div class="item title">K3</div>
+          <el-col :span="5">
+            <div class="item title">K2(2号传感器)</div>
           </el-col>
-          <el-col :span="6">
-            <div class="item title">K4</div>
+          <el-col :span="5">
+            <div class="item title">K3(3号传感器)</div>
+          </el-col>
+          <el-col :span="5">
+            <div class="item title">K4(4号传感器)</div>
           </el-col>
         </el-row>
 
         <el-row class="row" v-for="item of sensor_k" :key="item.gg">
           <el-divider></el-divider>
-          <el-col :span="6">
+          <el-col :span="4">
             <div class="item">{{ item.gg }}</div>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="5">
+            <div class="item">
+              <el-input-number
+                v-model="item.k1"
+                :precision="6"
+              ></el-input-number>
+            </div>
+          </el-col>
+          <el-col :span="5">
             <div class="item">
               <el-input-number
                 v-model="item.k2"
@@ -43,7 +54,7 @@
               ></el-input-number>
             </div>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="5">
             <div class="item">
               <el-input-number
                 v-model="item.k3"
@@ -51,7 +62,7 @@
               ></el-input-number>
             </div>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="5">
             <div class="item">
               <el-input-number
                 v-model="item.k4"
@@ -117,7 +128,7 @@ export default {
     },
 
     /**
-     * @description: 获取传感器的K2~K4
+     * @description: 获取传感器的K1~K4
      */
     getSensorK() {
       this.sensor_k = JSON.parse(window.localStorage.getItem('sensor_k'))
@@ -131,7 +142,7 @@ export default {
 
       /* 成功 */
       this.$message({
-        message: `K值保存成功`,
+        message: `K值修改成功`,
         type: 'success',
         duration: 2500
       })

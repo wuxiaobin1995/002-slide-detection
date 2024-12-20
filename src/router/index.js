@@ -1,7 +1,7 @@
 /*
  * @Author      : Mr.bin
  * @Date        : 2024-02-07 14:19:10
- * @LastEditTime: 2024-11-04 11:33:57
+ * @LastEditTime: 2024-12-20 16:38:37
  * @Description : 路由
  */
 import Vue from 'vue'
@@ -38,6 +38,22 @@ const routes = [
     name: 'set-k',
     component: () => import('@/views/set/set-k'),
     meta: ['修改传感器K值']
+  },
+
+  // 3个常数项：等高常数、到A常数、到B常数
+  {
+    path: '/set-cs',
+    name: 'set-cs',
+    component: () => import('@/views/set/set-cs'),
+    meta: ['3个常数项']
+  },
+
+  // 修改中心距评定上下限
+  {
+    path: '/set-centerSpacingMinMax',
+    name: 'set-centerSpacingMinMax',
+    component: () => import('@/views/set/set-centerSpacingMinMax'),
+    meta: ['修改中心距评定上下限']
   },
 
   {

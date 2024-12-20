@@ -1,8 +1,8 @@
 <!--
  * @Author      : Mr.bin
- * @Date        : 2024-11-04 11:34:40
- * @LastEditTime: 2024-12-20 16:38:00
- * @Description : home
+ * @Date        : 2024-03-12 15:11:07
+ * @LastEditTime: 2024-12-20 16:51:17
+ * @Description : home1
 -->
 <template>
   <div class="home" v-loading.fullscreen.lock="isSaveing">
@@ -17,7 +17,7 @@
             <div class="text">规格</div>
             <el-select
               v-model="specValue"
-              placeholder="先选择规格"
+              placeholder="请选择规格"
               @change="specChange"
             >
               <el-option
@@ -28,14 +28,13 @@
               </el-option>
             </el-select>
           </div>
-          <!-- 型号（需要先选择规格） -->
+          <!-- 型号 -->
           <div class="model">
             <div class="text">型号</div>
             <el-select
               v-model="modelValue"
-              placeholder="后选择型号"
+              placeholder="请选择型号"
               @change="modelChange"
-              :disabled="specValue === ''"
             >
               <el-option
                 v-for="item in modelSelection"
@@ -53,7 +52,7 @@
           <div>
             <el-input
               ref="QRCodeInput"
-              placeholder="建议使用扫码枪"
+              placeholder="建议不要手输，请用扫码枪"
               maxlength="8"
               v-model="QRCode"
             ></el-input>
@@ -76,68 +75,24 @@
           <el-button class="item" type="warning" @click="handleToSensorK"
             >修改 K 值</el-button
           >
-          <el-button class="item" type="warning" @click="handleToCS"
-            >修改标准值</el-button
-          >
-          <el-button
-            class="item"
-            type="warning"
-            @click="handleToCenterSpacingMinMax"
-            >修改中心距评定的上下限</el-button
-          >
-          <el-button class="item" type="success" @click="handleSensorDialog"
-            >调整传感器机械位置</el-button
-          >
-          <el-button class="item" type="success" @click="handleZero"
-            >调 零</el-button
+          <el-button class="item" type="warning" @click="handleSensorDialog"
+            >调整传感器位置</el-button
           >
         </div>
       </div>
 
-      <!-- 实时显示4个传感器的经过以下处理后的值 -->
-      <!-- k1是乘，k2~k4是除 -->
-      <!-- 悬空时显示为0 -->
+      <!-- 实时显示4个传感器的数字量 -->
       <div class="show">
         <div class="text">实时值：</div>
-        <div class="item">
-          {{
-            ((showSensorArray[0] - showOnceSensorArray[0]) * k1_show).toFixed(0)
-          }}
-        </div>
-        <div class="item">
-          {{
-            ((showSensorArray[1] - showOnceSensorArray[1]) / k2_show).toFixed(1)
-          }}
-        </div>
-        <div class="item">
-          {{
-            ((showSensorArray[2] - showOnceSensorArray[2]) / k3_show).toFixed(1)
-          }}
-        </div>
-        <div class="item">
-          {{
-            ((showSensorArray[3] - showOnceSensorArray[3]) / k4_show).toFixed(1)
-          }}
-        </div>
+        <div class="item">{{ showSensorArray[0] }}</div>
+        <div class="item">{{ showSensorArray[1] }}</div>
+        <div class="item">{{ showSensorArray[2] }}</div>
+        <div class="item">{{ showSensorArray[3] }}</div>
       </div>
 
       <!-- 显示按键按下时的原始数据 -->
-      <div class="show-2">被测滑块的原始数据：{{ finishSliderArray }}</div>
-      <div class="show-2">标准滑块的原始数据：{{ standardSliderArray }}</div>
-
-      <!-- 显示所选规格型号的3个常数项 -->
-      <div class="show-3">
-        对应规格型号的标准值：等高【{{ dgCS_show }}】，到A【{{
-          toACS_show
-        }}】，到B【{{ toBCS_show }}】
-      </div>
-
-      <!-- 选择规格（工位）后，对应K1~K4的值，用于AD*K的计算显示 -->
-      <div class="show-4">
-        对应工位的传感器 K值：k1【{{ k1_show }}】，k2【{{ k2_show }}】，k3【{{
-          k3_show
-        }}】，k4【{{ k4_show }}】
-      </div>
+      <div class="show-2">成品滑块数据数组：{{ finishSliderArray }}</div>
+      <div class="show-2">标准滑块数据数组：{{ standardSliderArray }}</div>
 
       <!-- 下侧表格 -->
       <div class="table">
@@ -173,8 +128,8 @@
           <el-table-column
             align="center"
             prop="zxj"
-            label="中心距评审结果 (0不合格，1合格，2小到标定值，3标定值到大)"
-            width="120"
+            label="中心距评审结果 (0不合格，1合格)"
+            width="100"
           />
           <!-- 等高 -->
           <el-table-column align="center" prop="dg" label="等高" width="80" />
@@ -227,7 +182,7 @@
 
     <!-- 调整传感器位置 -->
     <el-dialog
-      title="调整传感器机械位置"
+      title="调整传感器位置"
       :visible.sync="sensorDialogVisible"
       width="30%"
       top="20vh"
@@ -303,26 +258,10 @@ export default {
       /* 服务器地址ip */
       ip: '',
 
-      /* 传感器K1~K4的值 */
+      /* 传感器K2~K4的值 */
       sensor_k: [],
-      /* 3个常数项：等高常数、到A常数、到B常数 */
-      cs: [],
-      /* 中心距评定的上下限 */
-      centerSpacing_min_max: [],
-      /* 选择完规格型号后，把对应的3个常数项也显示出来，方便排查有没有bug和对不对得上 */
-      dgCS_show: '无',
-      toACS_show: '无',
-      toBCS_show: '无',
-      /* 选择规格（工位）后，对应K1~K4的值，用于AD×K或AD÷K的计算显示 */
-      k1_show: 0,
-      k2_show: 0,
-      k3_show: 0,
-      k4_show: 0,
 
-      /* 悬空时显示为0 */
-      showOnceSensorArray: [],
-
-      /* 调整传感器机械位置时专用 */
+      /* 调整传感器螺丝时专用 */
       sensorDialogVisible: false,
       showZeroSensorArray: [],
 
@@ -341,12 +280,6 @@ export default {
         {
           value: '30'
         }
-        // {
-        //   value: '35'
-        // },
-        // {
-        //   value: '45'
-        // }
       ],
       /* 型号 */
       modelValue: '',
@@ -381,22 +314,22 @@ export default {
       tableData: [],
       tableLoading: false, // 表格加载动画
 
-      /* 实时显示4个传感器的原始数据数组，一维数组 */
+      /* 实时显示4个传感器的数据数组，一维数组 */
       showSensorArray: [],
-      /* 标准滑块的原始数据数组，二维数组 */
+      /* 标准滑块数据数组，二维数组 */
       standardSliderArray: [],
-      /* 被测滑块的原始数据数组，二维数组 */
+      /* 成品滑块数据数组，二维数组 */
       finishSliderArray: [],
 
       /* 滑块的最终精度结果 */
-      centerSpacing: 0, // 中心距的评审结果（0：不合格，1：合格，2，3）
+      centerSpacing: 0, // 中心距的评审结果（1：合格，0：不合格）
       dg: 0, // 等高
       toA: 0, // 沟槽到A
       toB: 0, // 沟槽到B
       aParallel: 0, // A平行
       bParallel: 0, // B平行
       accuracyClass: '', // 精度等级
-      remark: '' // 互换性备注（E级互换、N级互换、不发互换、报废）
+      remark: '' // 备注（E级互换、N级互换、不发互换、报废）
     }
   },
 
@@ -405,51 +338,26 @@ export default {
     this.specValue = this.$store.state.spec
     this.modelValue = this.$store.state.model
 
-    /* 提示一下选择规格型号 */
-    if (this.specValue === '' || this.modelValue === '') {
-      this.$notify({
-        title: '温馨提示',
-        message: `请先选择"规格"，后选择"型号"`,
-        type: 'success',
-        position: 'top-left',
-        duration: 5000
-      })
-    }
-
-    /* 获取标准滑块的标定值 */
+    /* 获取标准滑块数据数组 */
     this.standardSliderArray = JSON.parse(
       window.sessionStorage.getItem('standard_slider_value')
     )
 
+    /* 获取服务器地址IP */
+    this.ip = window.localStorage.getItem('ip')
+
+    /* 获取传感器的K2~K4 */
+    this.sensor_k = JSON.parse(window.localStorage.getItem('sensor_k'))
+
     /* 开启串口通信 */
     this.initSerialPort()
 
-    /* 获取传感器的K1~K4 */
-    this.sensor_k = JSON.parse(window.localStorage.getItem('sensor_k'))
-    /* 获取3个常数项 */
-    this.cs = JSON.parse(window.localStorage.getItem('cs'))
-    /* 获取中心距评定的上下限 */
-    this.centerSpacing_min_max = JSON.parse(
-      window.localStorage.getItem('centerSpacing_min_max')
-    )
-    /* 把对应的3个常数项也显示出来，方便排查有没有bug和对不对得上 */
-    this.csShow()
-    /* 选择规格（工位）后，对应K1~K4的值，用于AD×K或AD÷K的计算显示 */
-    this.kShow()
-
-    /* 获取服务器地址IP */
-    this.ip = window.localStorage.getItem('ip')
     /* 获取表格数据 */
     this.getTableData()
   },
   mounted() {
     /* 二维码输入框获取鼠标焦点 */
     this.QRFocus()
-
-    /* 调零（用于悬空时显示为0） */
-    setTimeout(() => {
-      this.zero()
-    }, 1000)
   },
   beforeDestroy() {
     if (this.usbPort) {
@@ -490,6 +398,31 @@ export default {
     },
 
     /**
+     * @description: 调整传感器位置
+     */
+    handleSensorDialog() {
+      if (this.showSensorArray.length === 0) {
+        this.$message({
+          message: `请先选择规格和型号！`,
+          type: 'error',
+          duration: 3000
+        })
+      } else {
+        this.$confirm('请确保在"没有"套滑块的前提下，才进行该操作！', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          center: true,
+          type: 'warning'
+        })
+          .then(() => {
+            this.showZeroSensorArray = this.showSensorArray
+            this.sensorDialogVisible = true
+          })
+          .catch(() => {})
+      }
+    },
+
+    /**
      * @description: 获取表格数据
      */
     getTableData() {
@@ -500,7 +433,7 @@ export default {
           const api = `http://${this.ip}/st_t6_sql_001_slide_detection/public/index.php/slideDetection/getSlideDetectionData`
           this.$axios
             .post(api, {
-              num: 30 // 默认获取最新的n条，并且是T开头的才查询出来，因为凯特和双特共用同一个数据表
+              num: 50 // 默认获取最新的n条，并且是T开头的才查询出来，因为凯特和双特共用同一个数据表
             })
             .then(res => {
               const data = res.data
@@ -543,6 +476,7 @@ export default {
         })
       }
     },
+
     /**
      * @description: 删除数据按钮
      * @param {*} index
@@ -596,8 +530,9 @@ export default {
         })
         .catch(() => {})
     },
+
     /**
-     * @description: 覆盖数据弹窗（重测时会用到）
+     * @description: 覆盖数据弹窗
      */
     updateTableData() {
       this.$confirm(
@@ -618,7 +553,7 @@ export default {
           this.$axios
             .post(api, {
               sxm: this.QRCode,
-              xhgg: 'TSGS' + this.specValue + this.modelValue,
+              xhgg: 'TSGE' + this.specValue + this.modelValue,
               zxj: this.centerSpacing,
               dg: this.dg,
               daoa: this.toA,
@@ -637,7 +572,7 @@ export default {
                   type: 'success',
                   duration: 2000
                 })
-                // 被测滑块数据数组清空
+                // 成品滑块数据数组清空
                 this.finishSliderArray = []
               } else if (data.status === 0) {
                 /* 失败 */
@@ -689,7 +624,7 @@ export default {
             })
         })
         .catch(() => {
-          // 被测滑块数据数组清空
+          // 成品滑块数据数组清空
           this.finishSliderArray = []
         })
     },
@@ -719,7 +654,7 @@ export default {
         .catch(() => {})
     },
     /**
-     * @description: 前往开发者页面
+     * @description: 前往开发者页
      */
     handleToDeveloper() {
       this.$prompt('请输入密码', '提示', {
@@ -738,10 +673,68 @@ export default {
         .catch(() => {})
     },
     /**
-     * @description: 清空标准滑块的标定值按钮（包括也清空 SessionStorage 里面的）
+     * @description: 前往修改传感器K2~K4页
+     */
+    handleToSensorK() {
+      this.$prompt('请输入密码', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputPattern: /^st$/,
+        inputErrorMessage: '密码不正确',
+        showClose: true,
+        closeOnClickModal: false
+      })
+        .then(() => {
+          this.$router.push({
+            path: '/set-k'
+          })
+        })
+        .catch(() => {})
+    },
+
+    /**
+     * @description: 重扫二维码按钮
+     */
+    handleRescan() {
+      this.QRCode = ''
+      this.QRFocus() // 二维码输入框获取鼠标焦点
+    },
+
+    /**
+     * @description: 二维码输入框获取鼠标焦点函数
+     */
+    QRFocus() {
+      this.$refs.QRCodeInput.focus()
+    },
+
+    /**
+     * @description: 规格下拉框的选中值发生变化时触发
+     */
+    specChange() {
+      // Vuex更新一下规格
+      this.$store.dispatch('changeSpec', this.specValue)
+
+      // 清空标准滑块数据数组
+      this.standardSliderArray = []
+      window.sessionStorage.setItem('standard_slider_value', JSON.stringify([]))
+    },
+    /**
+     * @description: 型号下拉框的选中值发生变化时触发
+     */
+    modelChange() {
+      // Vuex更新一下型号
+      this.$store.dispatch('changeModel', this.modelValue)
+
+      // 清空标准滑块数据数组
+      this.standardSliderArray = []
+      window.sessionStorage.setItem('standard_slider_value', JSON.stringify([]))
+    },
+
+    /**
+     * @description: 清空标定值按钮（包括sessionStorage里面的）
      */
     handleClearStandard() {
-      this.$confirm('是否要清空标准滑块的标定值?', '提示', {
+      this.$confirm('是否要清空标定值?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         center: true,
@@ -760,428 +753,6 @@ export default {
           })
         })
         .catch(() => {})
-    },
-    /**
-     * @description: 前往修改传感器K1~K4页面
-     */
-    handleToSensorK() {
-      this.$prompt('请输入密码', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        inputPattern: /^st$/,
-        inputErrorMessage: '密码不正确',
-        showClose: true,
-        closeOnClickModal: false
-      })
-        .then(() => {
-          this.$router.push({
-            path: '/set-k'
-          })
-        })
-        .catch(() => {})
-    },
-    /**
-     * @description: 前往修改常数项页面
-     */
-    handleToCS() {
-      this.$prompt('请输入密码', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        inputPattern: /^st$/,
-        inputErrorMessage: '密码不正确',
-        showClose: true,
-        closeOnClickModal: false
-      })
-        .then(() => {
-          this.$router.push({
-            path: '/set-cs'
-          })
-        })
-        .catch(() => {})
-    },
-    /**
-     * @description: 前往修改中心距评定的上下限页面
-     */
-    handleToCenterSpacingMinMax() {
-      this.$prompt('请输入密码', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        inputPattern: /^st$/,
-        inputErrorMessage: '密码不正确',
-        showClose: true,
-        closeOnClickModal: false
-      })
-        .then(() => {
-          this.$router.push({
-            path: '/set-centerSpacingMinMax'
-          })
-        })
-        .catch(() => {})
-    },
-    /**
-     * @description: 调整传感器机械位置
-     */
-    handleSensorDialog() {
-      if (this.showSensorArray.length === 0) {
-        this.$message({
-          message: `请先选择规格和型号！`,
-          type: 'error',
-          duration: 3000
-        })
-      } else {
-        this.$confirm(
-          '请确保在"没有"套滑块的前提下（即传感器处于悬空状态时），才点击"确定"按钮！',
-          '提示',
-          {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            center: true,
-            type: 'warning'
-          }
-        )
-          .then(() => {
-            this.showZeroSensorArray = this.showSensorArray
-            this.sensorDialogVisible = true
-          })
-          .catch(() => {})
-      }
-    },
-    /**
-     * @description: 调零按钮（用于悬空时显示为0）
-     */
-    handleZero() {
-      if (this.showSensorArray.length === 0) {
-        this.$message({
-          message: `请先选择规格和型号！`,
-          type: 'error',
-          duration: 3000
-        })
-      } else {
-        this.$confirm(
-          '请确保在"没有"套滑块的前提下（即传感器处于悬空状态时），才点击"确定"按钮！',
-          '提示',
-          {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            center: true,
-            type: 'warning'
-          }
-        )
-          .then(() => {
-            this.zero()
-          })
-          .catch(() => {})
-      }
-    },
-    /**
-     * @description: 具体调零代码实现
-     */
-    zero() {
-      if (this.showSensorArray.length === 0) {
-      } else {
-        this.showOnceSensorArray = this.showSensorArray
-        this.$message({
-          message: `调零成功`,
-          type: 'success',
-          duration: 1500
-        })
-      }
-    },
-
-    /**
-     * @description: 重扫二维码按钮
-     */
-    handleRescan() {
-      this.QRCode = ''
-      this.QRFocus() // 二维码输入框获取鼠标焦点
-    },
-    /**
-     * @description: 二维码输入框获取鼠标焦点函数
-     */
-    QRFocus() {
-      this.$refs.QRCodeInput.focus()
-    },
-
-    /**
-     * @description: 规格下拉框的选中值发生变化时触发
-     */
-    specChange() {
-      // Vuex更新一下规格
-      this.$store.dispatch('changeSpec', this.specValue)
-
-      // 清空标准滑块数据数组
-      this.standardSliderArray = []
-      window.sessionStorage.setItem('standard_slider_value', JSON.stringify([]))
-
-      // 选择完规格型号后，把对应的3个常数项也显示出来，方便排查有没有bug和对不对得上
-      this.csShow()
-
-      // 选择规格（工位）后，对应K1~K4的值，用于AD*K的计算显示
-      this.kShow()
-
-      // 调零（用于悬空时显示为0）
-      setTimeout(() => {
-        this.zero()
-      }, 1000)
-    },
-    /**
-     * @description: 型号下拉框的选中值发生变化时触发
-     */
-    modelChange() {
-      // Vuex更新一下型号
-      this.$store.dispatch('changeModel', this.modelValue)
-
-      // 清空标准滑块数据数组
-      this.standardSliderArray = []
-      window.sessionStorage.setItem('standard_slider_value', JSON.stringify([]))
-
-      // 选择完规格型号后，把对应的3个常数项也显示出来，方便排查有没有bug和对不对得上
-      this.csShow()
-
-      // 调零（用于悬空时显示为0）
-      setTimeout(() => {
-        this.zero()
-      }, 1000)
-    },
-    /**
-     * @description: 选择完规格型号后，把对应的3个常数项也显示出来，方便排查有没有bug和对不对得上
-     */
-    csShow() {
-      this.dgCS_show = '无'
-      this.toACS_show = '无'
-      this.toBCS_show = '无'
-
-      const specValue = this.specValue // 规格
-      const modelValue = this.modelValue // 型号
-
-      if (specValue === '' || modelValue === '') {
-      } else {
-        // 等高常数、到A常数、到B常数
-        const cs = this.cs
-        const gx15AA = cs[0]
-        const gx15AN = cs[1]
-        const gx15DA = cs[2]
-        const gx20AA = cs[3]
-        const gx20EA = cs[4]
-        const gx20HAA = cs[5]
-        const gx20HEA = cs[6]
-        const gx25AA = cs[7]
-        const gx25EA = cs[8]
-        const gx25AN = cs[9]
-        const gx25HAA = cs[10]
-        const gx25HEA = cs[11]
-        const gx25HAN = cs[12]
-        const gx30AA = cs[13]
-        const gx30EA = cs[14]
-        const gx30AN = cs[15]
-        const gx30HAA = cs[16]
-        const gx30HEA = cs[17]
-        const gx30HAN = cs[18]
-
-        if (specValue === '15') {
-          switch (modelValue) {
-            case 'AA':
-              this.dgCS_show = gx15AA.dgCS
-              this.toACS_show = gx15AA.toACS
-              this.toBCS_show = gx15AA.toBCS
-              break
-            case 'AN':
-              this.dgCS_show = gx15AN.dgCS
-              this.toACS_show = gx15AN.toACS
-              this.toBCS_show = gx15AN.toBCS
-              break
-            case 'DA':
-              this.dgCS_show = gx15DA.dgCS
-              this.toACS_show = gx15DA.toACS
-              this.toBCS_show = gx15DA.toBCS
-              break
-            default:
-              this.dgCS_show = '无'
-              this.toACS_show = '无'
-              this.toBCS_show = '无'
-              break
-          }
-        } else if (specValue === '20') {
-          switch (modelValue) {
-            case 'AA':
-              this.dgCS_show = gx20AA.dgCS
-              this.toACS_show = gx20AA.toACS
-              this.toBCS_show = gx20AA.toBCS
-              break
-            case 'EA':
-              this.dgCS_show = gx20EA.dgCS
-              this.toACS_show = gx20EA.toACS
-              this.toBCS_show = gx20EA.toBCS
-              break
-            case 'HAA':
-              this.dgCS_show = gx20HAA.dgCS
-              this.toACS_show = gx20HAA.toACS
-              this.toBCS_show = gx20HAA.toBCS
-              break
-            case 'HEA':
-              this.dgCS_show = gx20HEA.dgCS
-              this.toACS_show = gx20HEA.toACS
-              this.toBCS_show = gx20HEA.toBCS
-              break
-            default:
-              this.dgCS_show = '无'
-              this.toACS_show = '无'
-              this.toBCS_show = '无'
-              break
-          }
-        } else if (specValue === '25') {
-          switch (modelValue) {
-            case 'AA':
-              this.dgCS_show = gx25AA.dgCS
-              this.toACS_show = gx25AA.toACS
-              this.toBCS_show = gx25AA.toBCS
-              break
-            case 'EA':
-              this.dgCS_show = gx25EA.dgCS
-              this.toACS_show = gx25EA.toACS
-              this.toBCS_show = gx25EA.toBCS
-              break
-            case 'AN':
-              this.dgCS_show = gx25AN.dgCS
-              this.toACS_show = gx25AN.toACS
-              this.toBCS_show = gx25AN.toBCS
-              break
-            case 'HAA':
-              this.dgCS_show = gx25HAA.dgCS
-              this.toACS_show = gx25HAA.toACS
-              this.toBCS_show = gx25HAA.toBCS
-              break
-            case 'HEA':
-              this.dgCS_show = gx25HEA.dgCS
-              this.toACS_show = gx25HEA.toACS
-              this.toBCS_show = gx25HEA.toBCS
-              break
-            case 'HAN':
-              this.dgCS_show = gx25HAN.dgCS
-              this.toACS_show = gx25HAN.toACS
-              this.toBCS_show = gx25HAN.toBCS
-              break
-            default:
-              this.dgCS_show = '无'
-              this.toACS_show = '无'
-              this.toBCS_show = '无'
-              break
-          }
-        } else if (specValue === '30') {
-          switch (modelValue) {
-            case 'AA':
-              this.dgCS_show = gx30AA.dgCS
-              this.toACS_show = gx30AA.toACS
-              this.toBCS_show = gx30AA.toBCS
-              break
-            case 'EA':
-              this.dgCS_show = gx30EA.dgCS
-              this.toACS_show = gx30EA.toACS
-              this.toBCS_show = gx30EA.toBCS
-              break
-            case 'AN':
-              this.dgCS_show = gx30AN.dgCS
-              this.toACS_show = gx30AN.toACS
-              this.toBCS_show = gx30AN.toBCS
-              break
-            case 'HAA':
-              this.dgCS_show = gx30HAA.dgCS
-              this.toACS_show = gx30HAA.toACS
-              this.toBCS_show = gx30HAA.toBCS
-              break
-            case 'HEA':
-              this.dgCS_show = gx30HEA.dgCS
-              this.toACS_show = gx30HEA.toACS
-              this.toBCS_show = gx30HEA.toBCS
-              break
-            case 'HAN':
-              this.dgCS_show = gx30HAN.dgCS
-              this.toACS_show = gx30HAN.toACS
-              this.toBCS_show = gx30HAN.toBCS
-              break
-            default:
-              this.dgCS_show = '无'
-              this.toACS_show = '无'
-              this.toBCS_show = '无'
-              break
-          }
-        } else if (specValue === '35') {
-          switch (modelValue) {
-            default:
-              this.dgCS_show = '无'
-              this.toACS_show = '无'
-              this.toBCS_show = '无'
-              break
-          }
-        } else if (specValue === '45') {
-          switch (modelValue) {
-            default:
-              this.dgCS_show = '无'
-              this.toACS_show = '无'
-              this.toBCS_show = '无'
-              break
-          }
-        }
-      }
-    },
-    /**
-     * @description: 选择规格（工位）后，对应K1~K4的值，用于AD*K的计算显示
-     */
-    kShow() {
-      this.k1_show = 0
-      this.k2_show = 0
-      this.k3_show = 0
-      this.k4_show = 0
-
-      const specValue = this.specValue // 规格
-      if (specValue === '') {
-      } else {
-        // 1~4号传感器K值
-        const sensor_k = this.sensor_k
-        const gg15 = sensor_k[0]
-        const gg20 = sensor_k[1]
-        const gg25 = sensor_k[2]
-        const gg30 = sensor_k[3]
-        const gg35 = sensor_k[4]
-        const gg45 = sensor_k[5]
-
-        if (specValue === '15') {
-          this.k1_show = gg15.k1
-          this.k2_show = gg15.k2
-          this.k3_show = gg15.k3
-          this.k4_show = gg15.k4
-        } else if (specValue === '20') {
-          this.k1_show = gg20.k1
-          this.k2_show = gg20.k2
-          this.k3_show = gg20.k3
-          this.k4_show = gg20.k4
-        } else if (specValue === '25') {
-          this.k1_show = gg25.k1
-          this.k2_show = gg25.k2
-          this.k3_show = gg25.k3
-          this.k4_show = gg25.k4
-        } else if (specValue === '30') {
-          this.k1_show = gg30.k1
-          this.k2_show = gg30.k2
-          this.k3_show = gg30.k3
-          this.k4_show = gg30.k4
-        } else if (specValue === '35') {
-          this.k1_show = gg35.k1
-          this.k2_show = gg35.k2
-          this.k3_show = gg35.k3
-          this.k4_show = gg35.k4
-        } else if (specValue === '45') {
-          this.k1_show = gg45.k1
-          this.k2_show = gg45.k2
-          this.k3_show = gg45.k3
-          this.k4_show = gg45.k4
-        } else {
-          this.k1_show = 0
-          this.k2_show = 0
-          this.k3_show = 0
-          this.k4_show = 0
-        }
-      }
     },
 
     /**
@@ -1347,34 +918,41 @@ export default {
                 }
                 // 按键的键值（0-没有按键，1-标定按键，2-测量按键，3-清空按键）
                 const keyNum = dataArray[0]
-                // 工位1或4（15或30）
+                // 工位1（15）
                 const workstation_1 = [
                   dataArray[1],
                   dataArray[2],
                   dataArray[3],
                   dataArray[4]
                 ]
-                // 工位2或5（20或35）
+                // 工位2（20）
                 const workstation_2 = [
                   dataArray[5],
                   dataArray[6],
                   dataArray[7],
                   dataArray[8]
                 ]
-                // 工位3或6（25或45）
+                // 工位3（25）
                 const workstation_3 = [
                   dataArray[9],
                   dataArray[10],
                   dataArray[11],
                   dataArray[12]
                 ]
+                // 工位4（30）
+                const workstation_4 = [
+                  dataArray[13],
+                  dataArray[14],
+                  dataArray[15],
+                  dataArray[16]
+                ]
 
                 /* 第2步：根据不同工位进行后续处理 */
                 // 先判断是否选择了规格和型号，都选择了才进行后续处理
                 if (this.specValue === '' || this.modelValue === '') {
                 } else {
-                  if (this.specValue === '15' || this.specValue === '30') {
-                    /* 工位1或工位4（15或30） */
+                  if (this.specValue === '15') {
+                    /* 工位1 */
                     if (keyNum === 0) {
                       // 没有按键按下，此时就单纯在界面上实时显示4个传感器的数字量，一维数组
                       this.showSensorArray = workstation_1
@@ -1408,7 +986,7 @@ export default {
                         })
                       }
                     } else if (keyNum === 2) {
-                      // 测量按键按下，此时就把数据存入到被测滑块数据数组，二维数组
+                      // 测量按键按下，此时就把数据存入到成品滑块数据数组，二维数组
                       if (this.finishSliderArray.length <= 2) {
                         // 按第1~3下
                         this.finishSliderArray.push([
@@ -1429,7 +1007,7 @@ export default {
                         this.save()
                       }
                     } else if (keyNum === 3) {
-                      // 清空按键按下，此时就把被测滑块数据数组清空
+                      // 清空按键按下，此时就把成品滑块数据数组清空
                       this.finishSliderArray = []
                       this.$message({
                         message: `清空成功`,
@@ -1437,11 +1015,8 @@ export default {
                         duration: 2500
                       })
                     }
-                  } else if (
-                    this.specValue === '20' ||
-                    this.specValue === '35'
-                  ) {
-                    /* 工位2或工位5（20或35） */
+                  } else if (this.specValue === '20') {
+                    /* 工位2 */
                     if (keyNum === 0) {
                       // 没有按键按下，此时就单纯在界面上实时显示4个传感器的数字量，一维数组
                       this.showSensorArray = workstation_2
@@ -1475,7 +1050,7 @@ export default {
                         })
                       }
                     } else if (keyNum === 2) {
-                      // 测量按键按下，此时就把数据存入到被测滑块数据数组，二维数组
+                      // 测量按键按下，此时就把数据存入到成品滑块数据数组，二维数组
                       if (this.finishSliderArray.length <= 2) {
                         // 按第1~3下
                         this.finishSliderArray.push([
@@ -1496,7 +1071,7 @@ export default {
                         this.save()
                       }
                     } else if (keyNum === 3) {
-                      // 清空按键按下，此时就把被测滑块数据数组清空
+                      // 清空按键按下，此时就把成品滑块数据数组清空
                       this.finishSliderArray = []
                       this.$message({
                         message: `清空成功`,
@@ -1504,11 +1079,8 @@ export default {
                         duration: 2500
                       })
                     }
-                  } else if (
-                    this.specValue === '25' ||
-                    this.specValue === '45'
-                  ) {
-                    /* 工位3或工位6（25或45） */
+                  } else if (this.specValue === '25') {
+                    /* 工位3 */
                     if (keyNum === 0) {
                       // 没有按键按下，此时就单纯在界面上实时显示4个传感器的数字量，一维数组
                       this.showSensorArray = workstation_3
@@ -1542,7 +1114,7 @@ export default {
                         })
                       }
                     } else if (keyNum === 2) {
-                      // 测量按键按下，此时就把数据存入到被测滑块数据数组，二维数组
+                      // 测量按键按下，此时就把数据存入到成品滑块数据数组，二维数组
                       if (this.finishSliderArray.length <= 2) {
                         // 按第1~3下
                         this.finishSliderArray.push([
@@ -1563,7 +1135,71 @@ export default {
                         this.save()
                       }
                     } else if (keyNum === 3) {
-                      // 清空按键按下，此时就把被测滑块数据数组清空
+                      // 清空按键按下，此时就把成品滑块数据数组清空
+                      this.finishSliderArray = []
+                      this.$message({
+                        message: `清空成功`,
+                        type: 'success',
+                        duration: 2500
+                      })
+                    }
+                  } else if (this.specValue === '30') {
+                    /* 工位4 */
+                    if (keyNum === 0) {
+                      // 没有按键按下，此时就单纯在界面上实时显示4个传感器的数字量，一维数组
+                      this.showSensorArray = workstation_4
+                    } else if (keyNum === 1) {
+                      // 标定按键按下，此时就把数据存入到标准滑块数据数组，二维数组
+                      if (this.standardSliderArray.length <= 2) {
+                        // 按第1~3下
+                        this.standardSliderArray.push([
+                          workstation_4[0],
+                          workstation_4[1],
+                          workstation_4[2],
+                          workstation_4[3]
+                        ])
+                      } else if (this.standardSliderArray.length === 3) {
+                        // 按第4下
+                        this.standardSliderArray.push([
+                          workstation_4[0],
+                          workstation_4[1],
+                          workstation_4[2],
+                          workstation_4[3]
+                        ])
+                        // 标定完成，标定值保存到SessionStorage
+                        window.sessionStorage.setItem(
+                          'standard_slider_value',
+                          JSON.stringify(this.standardSliderArray)
+                        )
+                        this.$message({
+                          message: `标定完成`,
+                          type: 'success',
+                          duration: 5000
+                        })
+                      }
+                    } else if (keyNum === 2) {
+                      // 测量按键按下，此时就把数据存入到成品滑块数据数组，二维数组
+                      if (this.finishSliderArray.length <= 2) {
+                        // 按第1~3下
+                        this.finishSliderArray.push([
+                          workstation_4[0],
+                          workstation_4[1],
+                          workstation_4[2],
+                          workstation_4[3]
+                        ])
+                      } else if (this.finishSliderArray.length === 3) {
+                        // 按第4下
+                        this.finishSliderArray.push([
+                          workstation_4[0],
+                          workstation_4[1],
+                          workstation_4[2],
+                          workstation_4[3]
+                        ])
+                        // 测量完成，调用save函数，计算结果并调用后端API
+                        this.save()
+                      }
+                    } else if (keyNum === 3) {
+                      // 清空按键按下，此时就把成品滑块数据数组清空
                       this.finishSliderArray = []
                       this.$message({
                         message: `清空成功`,
@@ -1623,7 +1259,6 @@ export default {
           const standard_array = this.standardSliderArray // 标定值，二维数组
           const finish_array = this.finishSliderArray // 测量值，二维数组
 
-          let centerSpacing_k = 0 // 1号传感器K值（应变片）
           let k2 = 0 // 2号传感器K值
           let k3 = 0 // 3号传感器K值
           let k4 = 0 // 4号传感器K值
@@ -1632,15 +1267,15 @@ export default {
           let toA_constant = 0 // 到A常数（μm）
           let toB_constant = 0 // 到B常数（μm）
 
-          let centerSpacing_min = 0 // 中心距min下限（5位压力数字量）
-          let centerSpacing_max = 0 // 中心距max上限（5位压力数字量）
+          let centerSpacing_min = 0 // 中心距下限（5位压力数字量）
+          let centerSpacing_max = 0 // 中心距上限（5位压力数字量）
 
           let n = 2 // 矩形2，法兰型3
           if (modelValue === 'EA' || modelValue === 'HEA') {
             n = 3
           }
 
-          // 1~4号传感器K值
+          // 2~4号传感器K值、等高常数、到A常数、到B常数
           const sensor_k = this.sensor_k
           const gg15 = sensor_k[0]
           const gg20 = sensor_k[1]
@@ -1648,37 +1283,6 @@ export default {
           const gg30 = sensor_k[3]
           const gg35 = sensor_k[4]
           const gg45 = sensor_k[5]
-          // 等高常数、到A常数、到B常数
-          const cs = this.cs
-          const gx15AA = cs[0]
-          const gx15AN = cs[1]
-          const gx15DA = cs[2]
-          const gx20AA = cs[3]
-          const gx20EA = cs[4]
-          const gx20HAA = cs[5]
-          const gx20HEA = cs[6]
-          const gx25AA = cs[7]
-          const gx25EA = cs[8]
-          const gx25AN = cs[9]
-          const gx25HAA = cs[10]
-          const gx25HEA = cs[11]
-          const gx25HAN = cs[12]
-          const gx30AA = cs[13]
-          const gx30EA = cs[14]
-          const gx30AN = cs[15]
-          const gx30HAA = cs[16]
-          const gx30HEA = cs[17]
-          const gx30HAN = cs[18]
-          // 中心距评定上下限
-          const centerSpacing_min_max = this.centerSpacing_min_max
-          const gx15 = centerSpacing_min_max[0]
-          const gx20 = centerSpacing_min_max[1]
-          const gx20H = centerSpacing_min_max[2]
-          const gx25 = centerSpacing_min_max[3]
-          const gx25H = centerSpacing_min_max[4]
-          const gx30 = centerSpacing_min_max[5]
-          const gx30H = centerSpacing_min_max[6]
-
           if (specValue === '15') {
             /* K2~K4 */
             k2 = gg15.k2
@@ -1686,19 +1290,19 @@ export default {
             k4 = gg15.k4
             switch (modelValue) {
               case 'AA':
-                dg_constant = gx15AA.dgCS
-                toA_constant = gx15AA.toACS
-                toB_constant = gx15AA.toBCS
+                dg_constant = 3
+                toA_constant = -11
+                toB_constant = -8
                 break
               case 'AN':
-                dg_constant = gx15AN.dgCS
-                toA_constant = gx15AN.toACS
-                toB_constant = gx15AN.toBCS
+                dg_constant = -4
+                toA_constant = 11
+                toB_constant = 2
                 break
               case 'DA':
-                dg_constant = gx15DA.dgCS
-                toA_constant = gx15DA.toACS
-                toB_constant = gx15DA.toBCS
+                dg_constant = 3
+                toA_constant = -11
+                toB_constant = -8
                 break
               default:
                 dg_constant = 0
@@ -1713,24 +1317,24 @@ export default {
             k4 = gg20.k4
             switch (modelValue) {
               case 'AA':
-                dg_constant = gx20AA.dgCS
-                toA_constant = gx20AA.toACS
-                toB_constant = gx20AA.toBCS
+                dg_constant = -1
+                toA_constant = 10
+                toB_constant = 3
                 break
               case 'EA':
-                dg_constant = gx20EA.dgCS
-                toA_constant = gx20EA.toACS
-                toB_constant = gx20EA.toBCS
+                dg_constant = 1
+                toA_constant = -11
+                toB_constant = -7
                 break
               case 'HAA':
-                dg_constant = gx20HAA.dgCS
-                toA_constant = gx20HAA.toACS
-                toB_constant = gx20HAA.toBCS
+                dg_constant = -1
+                toA_constant = 10
+                toB_constant = 3
                 break
               case 'HEA':
-                dg_constant = gx20HEA.dgCS
-                toA_constant = gx20HEA.toACS
-                toB_constant = gx20HEA.toBCS
+                dg_constant = 1
+                toA_constant = -11
+                toB_constant = -7
                 break
               default:
                 dg_constant = 0
@@ -1745,34 +1349,34 @@ export default {
             k4 = gg25.k4
             switch (modelValue) {
               case 'AA':
-                dg_constant = gx25AA.dgCS
-                toA_constant = gx25AA.toACS
-                toB_constant = gx25AA.toBCS
+                dg_constant = 0
+                toA_constant = 14
+                toB_constant = 4
                 break
               case 'EA':
-                dg_constant = gx25EA.dgCS
-                toA_constant = gx25EA.toACS
-                toB_constant = gx25EA.toBCS
+                dg_constant = 0
+                toA_constant = 10
+                toB_constant = 0
                 break
               case 'AN':
-                dg_constant = gx25AN.dgCS
-                toA_constant = gx25AN.toACS
-                toB_constant = gx25AN.toBCS
+                dg_constant = 2
+                toA_constant = 19
+                toB_constant = 10
                 break
               case 'HAA':
-                dg_constant = gx25HAA.dgCS
-                toA_constant = gx25HAA.toACS
-                toB_constant = gx25HAA.toBCS
+                dg_constant = 0
+                toA_constant = 14
+                toB_constant = 4
                 break
               case 'HEA':
-                dg_constant = gx25HEA.dgCS
-                toA_constant = gx25HEA.toACS
-                toB_constant = gx25HEA.toBCS
+                dg_constant = 0
+                toA_constant = 10
+                toB_constant = 0
                 break
               case 'HAN':
-                dg_constant = gx25HAN.dgCS
-                toA_constant = gx25HAN.toACS
-                toB_constant = gx25HAN.toBCS
+                dg_constant = 2
+                toA_constant = 19
+                toB_constant = 10
                 break
               default:
                 dg_constant = 0
@@ -1787,34 +1391,34 @@ export default {
             k4 = gg30.k4
             switch (modelValue) {
               case 'AA':
-                dg_constant = gx30AA.dgCS
-                toA_constant = gx30AA.toACS
-                toB_constant = gx30AA.toBCS
+                dg_constant = 4
+                toA_constant = 8
+                toB_constant = 18
                 break
               case 'EA':
-                dg_constant = gx30EA.dgCS
-                toA_constant = gx30EA.toACS
-                toB_constant = gx30EA.toBCS
+                dg_constant = -1
+                toA_constant = -6
+                toB_constant = -3
                 break
               case 'AN':
-                dg_constant = gx30AN.dgCS
-                toA_constant = gx30AN.toACS
-                toB_constant = gx30AN.toBCS
+                dg_constant = -2
+                toA_constant = -13
+                toB_constant = 6
                 break
               case 'HAA':
-                dg_constant = gx30HAA.dgCS
-                toA_constant = gx30HAA.toACS
-                toB_constant = gx30HAA.toBCS
+                dg_constant = 4
+                toA_constant = 8
+                toB_constant = 18
                 break
               case 'HEA':
-                dg_constant = gx30HEA.dgCS
-                toA_constant = gx30HEA.toACS
-                toB_constant = gx30HEA.toBCS
+                dg_constant = -1
+                toA_constant = -6
+                toB_constant = -3
                 break
               case 'HAN':
-                dg_constant = gx30HAN.dgCS
-                toA_constant = gx30HAN.toACS
-                toB_constant = gx30HAN.toBCS
+                dg_constant = -2
+                toA_constant = -13
+                toB_constant = 6
                 break
               default:
                 dg_constant = 0
@@ -1846,6 +1450,86 @@ export default {
                 toB_constant = 0
                 break
             }
+          }
+
+          /* 中心距的评审结果（0：不合格，1：合格） */
+          let centerSpacing_k = 0
+          switch (specValue) {
+            case '15':
+              centerSpacing_k = 0.0036
+              break
+            case '20':
+              centerSpacing_k = 0
+              break
+            case '25':
+              centerSpacing_k = 0
+              break
+            case '30':
+              centerSpacing_k = 0
+              break
+            default:
+              centerSpacing_k = 0
+              break
+          }
+          const standard_d = parseFloat(standard_array[0][0] * centerSpacing_k)
+          if (specValue === '15') {
+            centerSpacing_min = standard_d
+            centerSpacing_max = standard_d + 1
+          } else if (specValue === '20') {
+            if (
+              modelValue === 'HAA' ||
+              modelValue === 'HEA' ||
+              modelValue === 'HAN'
+            ) {
+              centerSpacing_min = standard_d - 4
+              centerSpacing_max = standard_d
+            } else {
+              centerSpacing_min = standard_d - 3
+              centerSpacing_max = standard_d + 2
+            }
+          } else if (specValue === '25') {
+            if (
+              modelValue === 'HAA' ||
+              modelValue === 'HEA' ||
+              modelValue === 'HAN'
+            ) {
+              centerSpacing_min = standard_d
+              centerSpacing_max = standard_d + 4
+            } else {
+              centerSpacing_min = standard_d - 3
+              centerSpacing_max = standard_d + 1
+            }
+          } else if (specValue === '30') {
+            if (
+              modelValue === 'HAA' ||
+              modelValue === 'HEA' ||
+              modelValue === 'HAN'
+            ) {
+              centerSpacing_min = standard_d - 1
+              centerSpacing_max = standard_d + 4
+            } else {
+              centerSpacing_min = standard_d - 1
+              centerSpacing_max = standard_d + 5
+            }
+          }
+          const finish_d = parseFloat(finish_array[0][0] * centerSpacing_k)
+          if (finish_d >= centerSpacing_min && finish_d <= centerSpacing_max) {
+            this.centerSpacing = 1
+          } else {
+            this.centerSpacing = 0
+          }
+          // 给一个中心距的评审不合格弹窗提示
+          if (this.centerSpacing === 0) {
+            this.$alert(
+              '该滑块的中心距评审不合格，请拿去换球，然后拿回来重测一遍！',
+              '提示',
+              {
+                confirmButtonText: '确定',
+                type: 'error',
+                center: true,
+                callback: () => {}
+              }
+            )
           }
 
           /* 等高 */
@@ -1995,120 +1679,11 @@ export default {
             }
           }
 
-          /* 中心距的评审结果（0：不合格，1：合格，2：小到标定值，3：标定值到大） */
-          // 在E级互换的前提下，1中再分2或3，也即轻预紧和重预紧
-          switch (specValue) {
-            case '15':
-              centerSpacing_k = gg15.k1
-              break
-            case '20':
-              centerSpacing_k = gg20.k1
-              break
-            case '25':
-              centerSpacing_k = gg25.k1
-              break
-            case '30':
-              centerSpacing_k = gg30.k1
-              break
-            case '35':
-              centerSpacing_k = gg35.k1
-              break
-            case '45':
-              centerSpacing_k = gg45.k1
-              break
-            default:
-              centerSpacing_k = 0
-              break
-          }
-          const standard_d = parseFloat(standard_array[0][0] * centerSpacing_k)
-          if (specValue === '15') {
-            centerSpacing_min = standard_d + gx15.centerSpacing_min
-            centerSpacing_max = standard_d + gx15.centerSpacing_max
-          } else if (specValue === '20') {
-            if (
-              modelValue === 'HAA' ||
-              modelValue === 'HEA' ||
-              modelValue === 'HAN'
-            ) {
-              centerSpacing_min = standard_d + gx20H.centerSpacing_min
-              centerSpacing_max = standard_d + gx20H.centerSpacing_max
-            } else {
-              centerSpacing_min = standard_d + gx20.centerSpacing_min
-              centerSpacing_max = standard_d + gx20.centerSpacing_max
-            }
-          } else if (specValue === '25') {
-            if (
-              modelValue === 'HAA' ||
-              modelValue === 'HEA' ||
-              modelValue === 'HAN'
-            ) {
-              centerSpacing_min = standard_d + gx25H.centerSpacing_min
-              centerSpacing_max = standard_d + gx25H.centerSpacing_max
-            } else {
-              centerSpacing_min = standard_d + gx25.centerSpacing_min
-              centerSpacing_max = standard_d + gx25.centerSpacing_max
-            }
-          } else if (specValue === '30') {
-            if (
-              modelValue === 'HAA' ||
-              modelValue === 'HEA' ||
-              modelValue === 'HAN'
-            ) {
-              centerSpacing_min = standard_d + gx30H.centerSpacing_min
-              centerSpacing_max = standard_d + gx30H.centerSpacing_max
-            } else {
-              centerSpacing_min = standard_d + gx30.centerSpacing_min
-              centerSpacing_max = standard_d + gx30.centerSpacing_max
-            }
-          }
-          const finish_d = parseFloat(finish_array[0][0] * centerSpacing_k)
-          if (finish_d >= centerSpacing_min && finish_d <= centerSpacing_max) {
-            this.centerSpacing = 1
-            // 在E级互换前提下，1再分为2或3
-            if (this.remark === 'E级互换') {
-              if (finish_d >= centerSpacing_min && finish_d <= standard_d) {
-                // 小到标定：2
-                this.centerSpacing = 2
-              } else {
-                // 标定到大：3
-                this.centerSpacing = 3
-              }
-            }
-          } else {
-            this.centerSpacing = 0
-          }
-          // 给一个中心距的评审不合格弹窗提示
-          if (this.centerSpacing === 0) {
-            this.$alert(
-              '该滑块的中心距评审不合格，请拿去换球，然后拿回来重测一遍！',
-              '提示',
-              {
-                confirmButtonText: '确定',
-                type: 'error',
-                center: true,
-                callback: () => {}
-              }
-            )
-          }
-          // 安全性判断，防止出现centerSpacing_min＞centerSpacing_max的情况，需要去中心距上下限页面排查
-          if (centerSpacing_min > centerSpacing_max) {
-            this.$alert(
-              '中心距评定的下限Min ＞ 中心距评定的上限Max，请停止检测，先去中心距上下限页面排查一下数值是否输入有误！',
-              '警告',
-              {
-                confirmButtonText: '确定',
-                type: 'error',
-                center: true,
-                callback: () => {}
-              }
-            )
-          }
-
           /* 精度等级（调用API直接返回结果） */
           const api = `http://${this.ip}/st_t6_sql_001_slide_detection/public/index.php/slideDetection/getTTData`
           this.$axios
             .post(api, {
-              xhgg: 'TSGS' + this.specValue + this.modelValue,
+              xhgg: 'TSGE' + this.specValue + this.modelValue,
               zxj: 0,
               dg: this.dg,
               daoa: this.toA,
@@ -2123,7 +1698,7 @@ export default {
                 this.accuracyClass = data.result[0].ReviewPrecision
 
                 // console.log(this.QRCode)
-                // console.log('TSGS' + this.specValue + this.modelValue)
+                // console.log('TSGE' + this.specValue + this.modelValue)
                 // console.log(this.centerSpacing)
                 // console.log(this.dg)
                 // console.log(this.toA)
@@ -2138,7 +1713,7 @@ export default {
                 this.$axios
                   .post(api, {
                     sxm: this.QRCode,
-                    xhgg: 'TSGS' + this.specValue + this.modelValue,
+                    xhgg: 'TSGE' + this.specValue + this.modelValue,
                     zxj: this.centerSpacing,
                     dg: this.dg,
                     daoa: this.toA,
@@ -2157,7 +1732,7 @@ export default {
                         type: 'success',
                         duration: 1000
                       })
-                      // 被测滑块数据数组清空
+                      // 成品滑块数据数组清空
                       this.finishSliderArray = []
                       // 二维码编号自增
                       this.QRCodeAdd()
@@ -2278,7 +1853,7 @@ export default {
     @include flex(column, stretch, stretch);
     /* 上侧内容区域 */
     .main {
-      height: 12%;
+      height: 10%;
       border-bottom: 2px solid rgb(0, 0, 0);
       @include flex(row, stretch, center);
       /* 规格型号 */
@@ -2313,18 +1888,14 @@ export default {
       .btn-bom {
         margin-left: 40px;
         .item {
-          margin-right: 10px;
-          margin-left: 10px;
-          margin-bottom: 10px;
+          margin-right: 20px;
         }
       }
     }
 
-    /* 实时显示4个传感器的经过处理后的值 */
+    /* 实时显示4个传感器值 */
     .show {
-      margin-bottom: 5px;
       height: 10%;
-      border-bottom: 2px solid rgb(0, 0, 0);
       @include flex(row, center, center);
       .text {
         font-size: 24px;
@@ -2336,28 +1907,11 @@ export default {
         padding: 5px 10px;
         font-size: 24px;
         color: red;
-        font-weight: 700;
       }
     }
-
     /* 显示按键按下时的原始数据 */
     .show-2 {
       font-size: 18px;
-    }
-    /* 显示所选规格型号的3个常数项 */
-    .show-3 {
-      font-size: 22px;
-      font-weight: 700;
-      margin-top: 15px;
-      margin-bottom: 5px;
-      color: red;
-    }
-    /* 选择规格（工位）后，对应K1~K4的值，用于AD*K的计算显示 */
-    .show-4 {
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 5px;
-      color: red;
     }
 
     /* 表格区域 */
