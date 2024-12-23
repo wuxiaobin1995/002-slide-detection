@@ -1,7 +1,7 @@
 <!--
  * @Author      : Mr.bin
  * @Date        : 2024-11-04 11:34:40
- * @LastEditTime: 2024-12-20 16:38:00
+ * @LastEditTime: 2024-12-23 11:07:11
  * @Description : home
 -->
 <template>
@@ -326,7 +326,7 @@ export default {
       sensorDialogVisible: false,
       showZeroSensorArray: [],
 
-      /* 规格（外协滑块暂时没有35与45） */
+      /* 规格（TGE低组装滑块没有35与45） */
       specValue: '',
       specSelection: [
         {
@@ -341,12 +341,6 @@ export default {
         {
           value: '30'
         }
-        // {
-        //   value: '35'
-        // },
-        // {
-        //   value: '45'
-        // }
       ],
       /* 型号 */
       modelValue: '',
@@ -618,7 +612,7 @@ export default {
           this.$axios
             .post(api, {
               sxm: this.QRCode,
-              xhgg: 'TSGS' + this.specValue + this.modelValue,
+              xhgg: 'TSGE' + this.specValue + this.modelValue,
               zxj: this.centerSpacing,
               dg: this.dg,
               daoa: this.toA,
@@ -1105,27 +1099,11 @@ export default {
               this.toBCS_show = '无'
               break
           }
-        } else if (specValue === '35') {
-          switch (modelValue) {
-            default:
-              this.dgCS_show = '无'
-              this.toACS_show = '无'
-              this.toBCS_show = '无'
-              break
-          }
-        } else if (specValue === '45') {
-          switch (modelValue) {
-            default:
-              this.dgCS_show = '无'
-              this.toACS_show = '无'
-              this.toBCS_show = '无'
-              break
-          }
         }
       }
     },
     /**
-     * @description: 选择规格（工位）后，对应K1~K4的值，用于AD*K的计算显示
+     * @description: 选择规格（工位）后，对应K1~K4的值
      */
     kShow() {
       this.k1_show = 0
@@ -1142,8 +1120,6 @@ export default {
         const gg20 = sensor_k[1]
         const gg25 = sensor_k[2]
         const gg30 = sensor_k[3]
-        const gg35 = sensor_k[4]
-        const gg45 = sensor_k[5]
 
         if (specValue === '15') {
           this.k1_show = gg15.k1
@@ -1165,16 +1141,6 @@ export default {
           this.k2_show = gg30.k2
           this.k3_show = gg30.k3
           this.k4_show = gg30.k4
-        } else if (specValue === '35') {
-          this.k1_show = gg35.k1
-          this.k2_show = gg35.k2
-          this.k3_show = gg35.k3
-          this.k4_show = gg35.k4
-        } else if (specValue === '45') {
-          this.k1_show = gg45.k1
-          this.k2_show = gg45.k2
-          this.k3_show = gg45.k3
-          this.k4_show = gg45.k4
         } else {
           this.k1_show = 0
           this.k2_show = 0
@@ -1347,34 +1313,41 @@ export default {
                 }
                 // 按键的键值（0-没有按键，1-标定按键，2-测量按键，3-清空按键）
                 const keyNum = dataArray[0]
-                // 工位1或4（15或30）
+                // 工位1
                 const workstation_1 = [
                   dataArray[1],
                   dataArray[2],
                   dataArray[3],
                   dataArray[4]
                 ]
-                // 工位2或5（20或35）
+                // 工位2
                 const workstation_2 = [
                   dataArray[5],
                   dataArray[6],
                   dataArray[7],
                   dataArray[8]
                 ]
-                // 工位3或6（25或45）
+                // 工位3
                 const workstation_3 = [
                   dataArray[9],
                   dataArray[10],
                   dataArray[11],
                   dataArray[12]
                 ]
+                // 工位4
+                const workstation_4 = [
+                  dataArray[13],
+                  dataArray[14],
+                  dataArray[15],
+                  dataArray[16]
+                ]
 
                 /* 第2步：根据不同工位进行后续处理 */
                 // 先判断是否选择了规格和型号，都选择了才进行后续处理
                 if (this.specValue === '' || this.modelValue === '') {
                 } else {
-                  if (this.specValue === '15' || this.specValue === '30') {
-                    /* 工位1或工位4（15或30） */
+                  if (this.specValue === '15') {
+                    /* 工位1 */
                     if (keyNum === 0) {
                       // 没有按键按下，此时就单纯在界面上实时显示4个传感器的数字量，一维数组
                       this.showSensorArray = workstation_1
@@ -1437,11 +1410,8 @@ export default {
                         duration: 2500
                       })
                     }
-                  } else if (
-                    this.specValue === '20' ||
-                    this.specValue === '35'
-                  ) {
-                    /* 工位2或工位5（20或35） */
+                  } else if (this.specValue === '20') {
+                    /* 工位2 */
                     if (keyNum === 0) {
                       // 没有按键按下，此时就单纯在界面上实时显示4个传感器的数字量，一维数组
                       this.showSensorArray = workstation_2
@@ -1504,11 +1474,8 @@ export default {
                         duration: 2500
                       })
                     }
-                  } else if (
-                    this.specValue === '25' ||
-                    this.specValue === '45'
-                  ) {
-                    /* 工位3或工位6（25或45） */
+                  } else if (this.specValue === '25') {
+                    /* 工位3 */
                     if (keyNum === 0) {
                       // 没有按键按下，此时就单纯在界面上实时显示4个传感器的数字量，一维数组
                       this.showSensorArray = workstation_3
@@ -1564,6 +1531,70 @@ export default {
                       }
                     } else if (keyNum === 3) {
                       // 清空按键按下，此时就把被测滑块数据数组清空
+                      this.finishSliderArray = []
+                      this.$message({
+                        message: `清空成功`,
+                        type: 'success',
+                        duration: 2500
+                      })
+                    }
+                  } else if (this.specValue === '30') {
+                    /* 工位4 */
+                    if (keyNum === 0) {
+                      // 没有按键按下，此时就单纯在界面上实时显示4个传感器的数字量，一维数组
+                      this.showSensorArray = workstation_4
+                    } else if (keyNum === 1) {
+                      // 标定按键按下，此时就把数据存入到标准滑块数据数组，二维数组
+                      if (this.standardSliderArray.length <= 2) {
+                        // 按第1~3下
+                        this.standardSliderArray.push([
+                          workstation_4[0],
+                          workstation_4[1],
+                          workstation_4[2],
+                          workstation_4[3]
+                        ])
+                      } else if (this.standardSliderArray.length === 3) {
+                        // 按第4下
+                        this.standardSliderArray.push([
+                          workstation_4[0],
+                          workstation_4[1],
+                          workstation_4[2],
+                          workstation_4[3]
+                        ])
+                        // 标定完成，标定值保存到SessionStorage
+                        window.sessionStorage.setItem(
+                          'standard_slider_value',
+                          JSON.stringify(this.standardSliderArray)
+                        )
+                        this.$message({
+                          message: `标定完成`,
+                          type: 'success',
+                          duration: 5000
+                        })
+                      }
+                    } else if (keyNum === 2) {
+                      // 测量按键按下，此时就把数据存入到成品滑块数据数组，二维数组
+                      if (this.finishSliderArray.length <= 2) {
+                        // 按第1~3下
+                        this.finishSliderArray.push([
+                          workstation_4[0],
+                          workstation_4[1],
+                          workstation_4[2],
+                          workstation_4[3]
+                        ])
+                      } else if (this.finishSliderArray.length === 3) {
+                        // 按第4下
+                        this.finishSliderArray.push([
+                          workstation_4[0],
+                          workstation_4[1],
+                          workstation_4[2],
+                          workstation_4[3]
+                        ])
+                        // 测量完成，调用save函数，计算结果并调用后端API
+                        this.save()
+                      }
+                    } else if (keyNum === 3) {
+                      // 清空按键按下，此时就把成品滑块数据数组清空
                       this.finishSliderArray = []
                       this.$message({
                         message: `清空成功`,
@@ -1646,8 +1677,6 @@ export default {
           const gg20 = sensor_k[1]
           const gg25 = sensor_k[2]
           const gg30 = sensor_k[3]
-          const gg35 = sensor_k[4]
-          const gg45 = sensor_k[5]
           // 等高常数、到A常数、到B常数
           const cs = this.cs
           const gx15AA = cs[0]
@@ -1822,30 +1851,6 @@ export default {
                 toB_constant = 0
                 break
             }
-          } else if (specValue === '35') {
-            /* K2~K4 */
-            k2 = gg35.k2
-            k3 = gg35.k3
-            k4 = gg35.k4
-            switch (modelValue) {
-              default:
-                dg_constant = 0
-                toA_constant = 0
-                toB_constant = 0
-                break
-            }
-          } else if (specValue === '45') {
-            /* K2~K4 */
-            k2 = gg45.k2
-            k3 = gg45.k3
-            k4 = gg45.k4
-            switch (modelValue) {
-              default:
-                dg_constant = 0
-                toA_constant = 0
-                toB_constant = 0
-                break
-            }
           }
 
           /* 等高 */
@@ -2010,12 +2015,6 @@ export default {
             case '30':
               centerSpacing_k = gg30.k1
               break
-            case '35':
-              centerSpacing_k = gg35.k1
-              break
-            case '45':
-              centerSpacing_k = gg45.k1
-              break
             default:
               centerSpacing_k = 0
               break
@@ -2108,7 +2107,7 @@ export default {
           const api = `http://${this.ip}/st_t6_sql_001_slide_detection/public/index.php/slideDetection/getTTData`
           this.$axios
             .post(api, {
-              xhgg: 'TSGS' + this.specValue + this.modelValue,
+              xhgg: 'TSGE' + this.specValue + this.modelValue,
               zxj: 0,
               dg: this.dg,
               daoa: this.toA,
@@ -2123,7 +2122,7 @@ export default {
                 this.accuracyClass = data.result[0].ReviewPrecision
 
                 // console.log(this.QRCode)
-                // console.log('TSGS' + this.specValue + this.modelValue)
+                // console.log('TSGE' + this.specValue + this.modelValue)
                 // console.log(this.centerSpacing)
                 // console.log(this.dg)
                 // console.log(this.toA)
@@ -2138,7 +2137,7 @@ export default {
                 this.$axios
                   .post(api, {
                     sxm: this.QRCode,
-                    xhgg: 'TSGS' + this.specValue + this.modelValue,
+                    xhgg: 'TSGE' + this.specValue + this.modelValue,
                     zxj: this.centerSpacing,
                     dg: this.dg,
                     daoa: this.toA,
