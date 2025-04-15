@@ -1,7 +1,7 @@
 <!--
  * @Author      : Mr.bin
  * @Date        : 2024-11-04 11:34:40
- * @LastEditTime: 2025-02-08 11:34:27
+ * @LastEditTime: 2025-04-15 17:46:26
  * @Description : home
 -->
 <template>
@@ -1905,7 +1905,7 @@ export default {
           this.bParallel = bParallelMax - bParallelMin
           this.bParallel = parseInt(this.bParallel.toFixed(0))
 
-          /* 备注互换性评审：E级互换、N级互换、不发互换、报废 */
+          /* 备注互换性评审：E(4)级互换、N(5)级互换、不发互换、报废 */
           const dg_abs = Math.abs(this.dg) // 等高的绝对值
           const toA_abs = Math.abs(this.toA) // 到A的绝对值
           const toB_abs = Math.abs(this.toB) // 到B的绝对值
@@ -1923,61 +1923,61 @@ export default {
             if (specValue === '45') {
               if (toA_abs > 100) {
                 toA_res = '报废'
-              } else if (toA_abs > 25 && toA_abs <= 100) {
+              } else if (toA_abs > 10 && toA_abs <= 100) {
                 toA_res = '不发互换'
-              } else if (toA_abs > 5 && toA_abs <= 25) {
-                toA_res = 'N级互换'
+              } else if (toA_abs > 5 && toA_abs <= 10) {
+                toA_res = '5级互换'
               } else {
-                toA_res = 'E级互换'
+                toA_res = '4级互换'
               }
             } else {
               if (toA_abs > 80) {
                 toA_res = '报废'
-              } else if (toA_abs > 20 && toA_abs <= 80) {
+              } else if (toA_abs > 10 && toA_abs <= 80) {
                 toA_res = '不发互换'
-              } else if (toA_abs > 5 && toA_abs <= 20) {
-                toA_res = 'N级互换'
+              } else if (toA_abs > 5 && toA_abs <= 10) {
+                toA_res = '5级互换'
               } else {
-                toA_res = 'E级互换'
+                toA_res = '4级互换'
               }
             }
             // 判断到B互换性
             if (specValue === '45') {
               if (toB_abs > 160) {
                 toB_res = '报废'
-              } else if (toB_abs > 45 && toB_abs <= 160) {
+              } else if (toB_abs > 40 && toB_abs <= 160) {
                 toB_res = '不发互换'
-              } else if (toB_abs > 15 && toB_abs <= 45) {
-                toB_res = 'N级互换'
+              } else if (toB_abs > 15 && toB_abs <= 40) {
+                toB_res = '5级互换'
               } else {
-                toB_res = 'E级互换'
+                toB_res = '4级互换'
               }
             } else {
               if (toB_abs > 150) {
                 toB_res = '报废'
-              } else if (toB_abs > 40 && toB_abs <= 150) {
+              } else if (toB_abs > 35 && toB_abs <= 150) {
                 toB_res = '不发互换'
-              } else if (toB_abs > 12 && toB_abs <= 40) {
-                toB_res = 'N级互换'
+              } else if (toB_abs > 12 && toB_abs <= 35) {
+                toB_res = '5级互换'
               } else {
-                toB_res = 'E级互换'
+                toB_res = '4级互换'
               }
             }
             // 判断A平行互换性
             if (this.aParallel > 40) {
               aParallel_res = '报废'
             } else if (this.aParallel > 10 && this.aParallel <= 40) {
-              aParallel_res = 'N级互换'
+              aParallel_res = '5级互换'
             } else {
-              aParallel_res = 'E级互换'
+              aParallel_res = '4级互换'
             }
             // 判断B平行互换性
             if (this.bParallel > 40) {
               bParallel_res = '报废'
             } else if (this.bParallel > 15 && this.bParallel <= 40) {
-              bParallel_res = 'N级互换'
+              bParallel_res = '5级互换'
             } else {
-              bParallel_res = 'E级互换'
+              bParallel_res = '4级互换'
             }
             // 最终再判断互换性
             if (
@@ -1990,19 +1990,19 @@ export default {
             } else if (toA_res === '不发互换' || toB_res === '不发互换') {
               this.remark = '不发互换'
             } else if (
-              toA_res === 'N级互换' ||
-              toB_res === 'N级互换' ||
-              aParallel_res === 'N级互换' ||
-              bParallel_res === 'N级互换'
+              toA_res === '5级互换' ||
+              toB_res === '5级互换' ||
+              aParallel_res === '5级互换' ||
+              bParallel_res === '5级互换'
             ) {
-              this.remark = 'N级互换'
+              this.remark = '5级互换'
             } else {
-              this.remark = 'E级互换'
+              this.remark = '4级互换'
             }
           }
 
           /* 中心距的评审结果（0：不合格，1：合格，2：小到标定值，3：标定值到大） */
-          // 在E级互换的前提下，1中再分2或3，也即轻预紧和重预紧
+          // 在E(4)级互换的前提下，1中再分2或3，也即轻预紧和重预紧
           switch (specValue) {
             case '15':
               centerSpacing_k = gg15.k1
@@ -2064,8 +2064,8 @@ export default {
           const finish_d = parseFloat(finish_array[0][0] * centerSpacing_k)
           if (finish_d >= centerSpacing_min && finish_d <= centerSpacing_max) {
             this.centerSpacing = 1
-            // 在E级互换前提下，1再分为2或3
-            if (this.remark === 'E级互换') {
+            // 在E(4)级互换前提下，1再分为2或3
+            if (this.remark === '4级互换') {
               if (finish_d >= centerSpacing_min && finish_d <= standard_d) {
                 // 小到标定：2
                 this.centerSpacing = 2
